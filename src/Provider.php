@@ -2,48 +2,76 @@
 
 namespace Akaunting\Language;
 
-use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
-use Jenssegers\Agent\AgentServiceProvider;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Foundation\AliasLoader;
 
 class Provider extends ServiceProvider
 {
     /**
-     * Bootstrap the application services.
-     *
-     * @param Router $router
-     *
-     * @return void
-     */
-    public function boot(Router $router)
-    {
-        if (!$this->app->routesAreCached()) {
-            require __DIR__ . '/Routes/web.php';
-        }
-
-        $this->publishes([
-            __DIR__ . '/Config/language.php'                                  => config_path('language.php'),
-            __DIR__ . '/Migrations/2020_01_01_000000_add_locale_column.php'   => database_path('migrations/2020_01_01_000000_add_locale_column.php'),
-            __DIR__ . '/Resources/views/flag.blade.php'                       => resource_path('views/vendor/language/flag.blade.php'),
-            __DIR__ . '/Resources/views/flags.blade.php'                      => resource_path('views/vendor/language/flags.blade.php'),
-        ], 'language');
-
-        $router->aliasMiddleware('language', config('language.middleware'));
-
-        $this->app->register(AgentServiceProvider::class);
-
-        $this->app->singleton('language', function ($app) {
-            return new Language($app);
-        });
-    }
-
-    /**
-     * Register the application services.
+     * Register the service provider.
      *
      * @return void
      */
     public function register()
     {
-        $this->mergeConfigFrom(__DIR__ . '/Config/language.php', 'language');
+        $this->mergeConfigFrom(__DIR__ . '/config/language.php', 'language');
+    }
+
+    /**
+     * Bootstrap the application events.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        // Publier la configuration
+        $this->publishes([
+            __DIR__ . '/config/language.php' => config_path('language.php'),
+        ], 'language-config');
+
+        // Publier les vues
+        $this->publishes([
+            __DIR__ . '/resources/views' => resource_path('views/vendor/language'),
+        ], 'language-views');
+
+        // Publier les assets
+        $this->publishes([
+            __DIR__ . '/resources/assets' => public_path('vendor/language'),
+        ], 'language-assets');
+
+        // Charger les vues
+        $this->loadViewsFrom(__DIR__ . '/resources/views', 'language');
+
+        // Charger les routes
+        $this->loadRoutesFrom(__DIR__ . '/routes/web.php');
+
+        // Charger les migrations
+        $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
+
+        // Charger les traductions
+        $this->loadTranslationsFrom(__DIR__ . '/resources/lang', 'language');
+
+        // Enregistrer les commandes
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                // Ajoutez vos commandes ici
+            ]);
+        }
+
+        // Middleware global pour la détection de langue
+        if (config('language.auto_detect', true)) {
+            $this->app['router']->pushMiddlewareToGroup('web', Middleware\SetLanguage::class);
+        }
+    }
+
+    /**
+     * Get the services provided by the provider.
+     *
+     * @return array
+     */
+    public function provides()
+    {
+        return [];
     }
 }

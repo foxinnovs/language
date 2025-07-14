@@ -1,41 +1,53 @@
 {
-    "name": "akaunting/laravel-language",
-    "description": "Language switcher package for Laravel",
-    "keywords": [
-        "laravel",
-        "language",
-        "switcher"
-    ],
+    "name": "foxinnovs/language",
+    "description": "Laravel Language Package - Fork compatible Laravel 12",
+    "keywords": ["laravel", "language", "locale", "translation", "multilingual"],
     "license": "MIT",
     "authors": [
         {
             "name": "Denis Duliçi",
             "email": "info@akaunting.com",
             "homepage": "https://akaunting.com",
-            "role": "Developer"
+            "role": "Original Developer"
+        },
+        {
+            "name": "FoxInnovs",
+            "role": "Laravel 12 Fork Maintainer"
         }
     ],
     "require": {
-        "php": ">=5.6.4",
-        "laravel/framework": ">=5.4.0",
-        "jenssegers/agent": "2.6.*"
+        "php": "^8.1|^8.2|^8.3",
+        "illuminate/support": "^10.0|^11.0|^12.0",
+        "illuminate/translation": "^10.0|^11.0|^12.0",
+        "illuminate/http": "^10.0|^11.0|^12.0",
+        "illuminate/routing": "^10.0|^11.0|^12.0",
+        "illuminate/console": "^10.0|^11.0|^12.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.0|^11.0",
+        "orchestra/testbench": "^8.0|^9.0|^10.0",
+        "laravel/pint": "^1.0"
     },
     "autoload": {
         "psr-4": {
-            "Akaunting\\Language\\": "./src"
-        },
-        "files": [
-            "src/helpers.php"
-        ]
+            "Akaunting\\Language\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Akaunting\\Language\\Tests\\": "tests/"
+        }
     },
     "extra": {
         "laravel": {
             "providers": [
                 "Akaunting\\Language\\Provider"
-            ],
-            "aliases": {
-                "Language": "Akaunting\\Language\\Facade"
-            }
+            ]
         }
-    }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
